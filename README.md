@@ -24,7 +24,7 @@ Requirements
 
 2. [Java](https://www.java.com/en/download/) installed on the server
 
-
+3. Currently only Android devices are supported as clients.
 
 Sounds
 ------
@@ -41,26 +41,35 @@ a sound clip.
 I.e. `runaway//RUN AWAY!`, where the file is called `RUN AWAY!.wav` while the code for the 
 sound will become `runaway`. Keep the code for the sound clip simple (no whitespaces/symbols/uppercase), and the name of the sound file without the `.wav` ending.
 
-
+A full setup for sounds and the server can be found [in this example](https://github.com/mktange/AwesomeButton/releases/download/1.0/ExampleSetup.zip)
 
 Setup
 -----
 
 ### Server:
 
-1. Start the AwesomeButtonServer on the designated music computer by executing the `AwesomeButtonServer.jar` file
+1. Start the AwesomeButtonServer on the designated music computer by executing the [AwesomeButtonServer.jar](https://github.com/mktange/AwesomeButton/releases/download/1.0/AwesomeButtonMobile.apk) file
 
-2. Note the IP the server can be seen in the first line of the log window upon start-up.
+2. Note the IP the server which can be seen in the first line of the log window upon start-up.
 
+3. If Silverjuke is to be used at the same time, click the `Find Silverjuke` button and locate `Silverjuke.exe` on your computer with the file finder.
 
 ### Client:
 
-1. Open the client app, and hit `Settings > Set Server IP`. Here enter
-the IP the server was given.
+Get the AwesomeButton app by downloading the [AwesomeButtonMobile.apk](https://github.com/mktange/AwesomeButton/releases/download/1.0/AwesomeButtonMobile.apk) file onto your device and installing it. Note that you may need to give extra permissions to the application before you are allowed to install it.
 
-2. Now to get the sound list on the clients hit `Settings > Get
-sounds`
+Then to use it:
+
+1. Open the client app, and hit `Settings > Set Server IP`. Here enter the IP the server was given.
+
+2. Now get the sound list on the client by hitting `Settings > Get sounds`
 
 3. ???
 
 4. PROFIT
+
+
+Fork me
+-------
+
+Feel free to fork and extend the application with more awesome features. This was mostly coded in a few hours, so it could do with some improvements!
