@@ -1,0 +1,12 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+	
+    <PreferenceCategory android:title="@string/connection" >
+        <EditTextPreference
+            android:defaultValue="192.168.0.1"
+            android:key="connect_to"
+            android:summary="IP of music computer"
+            android:title="Server IP"
+            android:inputType="textUri" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

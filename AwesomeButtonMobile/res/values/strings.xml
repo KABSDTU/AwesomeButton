@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">AwesomeButton</string>
+    <string name="serverip">Set Server IP</string>
+    <string name="clear_list">Clear sound list</string>
+    <string name="update_list">Get sounds</string>
+    
+    <string name="connection">Connection</string>
+    <string name="favorites">Favorites</string>
+    <string name="all">All</string>
+    <string name="infomessage">No sounds stored.\nMake sure the Server IP is set correctly,\nand then try updating via the menu.</string>
+
+</resources>
