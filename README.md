@@ -9,6 +9,11 @@ such that every time a sound clip is played on the server, it will
 lower the volume of Silverjuke until the end of the sound.
 
 
+Fork me
+=======
+
+Feel free to fork and extend the application with more awesome features. This was mostly coded in a few hours, so it could do with some improvements!
+
 
 Getting started
 ===============
@@ -41,7 +46,7 @@ a sound clip.
 I.e. `runaway//RUN AWAY!`, where the file is called `RUN AWAY!.wav` while the code for the 
 sound will become `runaway`. Keep the code for the sound clip simple (no whitespaces/symbols/uppercase), and the name of the sound file without the `.wav` ending.
 
-A full setup for sounds and the server can be found [in this example](https://github.com/mktange/AwesomeButton/releases/download/1.0/ExampleSetup.zip)
+A full setup including sounds and the server executable can be found [in this example](https://github.com/mktange/AwesomeButton/releases/download/1.0/ExampleSetup.zip)
 
 Setup
 -----
@@ -60,16 +65,13 @@ Get the AwesomeButton app by downloading the [AwesomeButtonMobile.apk](https://g
 
 Then to use it:
 
-1. Open the client app, and hit `Settings > Set Server IP`. Here enter the IP the server was given.
+1. Be sure to connected to the same wireless/local network as the server.
 
-2. Now get the sound list on the client by hitting `Settings > Get sounds`
+2. Open the client app, and hit `Settings > Set Server IP`. Here enter the IP the server was given.
 
-3. ???
+3. Now get the sound list on the client by hitting `Settings > Get sounds`
 
-4. PROFIT
+4. ???
 
+5. PROFIT
 
-Fork me
--------
-
-Feel free to fork and extend the application with more awesome features. This was mostly coded in a few hours, so it could do with some improvements!
