@@ -10,9 +10,10 @@ import java.io.Serializable;
 public class Settings implements Serializable {
 	private static final long serialVersionUID = -1566695152415046220L;
 	private static final String SETTINGSFILE = "settings.cfg";
+	public static final int STANDARD_DELAY = 30000;
 	
 	private String SjPath = null;
-	private int blockDelay = 30000;
+	private int blockDelay = STANDARD_DELAY;
 	private int minVol = 50;
 	private int maxVol = 255;
 

@@ -26,6 +26,7 @@ public class AwesomeButton {
 	private boolean currentlyPlaying = true;
 	private Object mutex = new Object();
 
+	private Blocker blocker = new Blocker(Settings.STANDARD_DELAY);
 	public Settings settings = Settings.loadSettings();
 	private AwesomeButtonGUI GUI;
 	
@@ -94,15 +95,15 @@ public class AwesomeButton {
 		} else {
 		
 			GUI.println("Received \""+m+"\" from "+p.getAddress().toString());
-			if (Lib.SOUNDS.containsKey(m)) { // Play a sound
-				requestSound(p.getAddress(), Lib.SOUNDS.get(m));
-			}
+			requestSound(p.getAddress(), m);
 		}
 	}
 
-	private void requestSound(InetAddress ip, Sound sound) throws Exception {
-		if (!blocked.contains(ip) && playSound(sound)) {
-			block(ip);
+	private void requestSound(InetAddress ip, String soundString) throws Exception {
+		if (blocker.checkAndBlock(ip) && Lib.SOUNDS.containsKey(soundString)) {
+			playSound(Lib.SOUNDS.get(soundString));
+		} else {
+			GUI.println("Could not play song: " + soundString + ". Maybe IP is blocked?");
 		}
 	}
 
@@ -132,15 +133,6 @@ public class AwesomeButton {
 			}
 		});
 		return true;
-	}
-
-	public synchronized void block(InetAddress ip) {
-		this.blocked.add(ip);
-		(new Blocker(this, ip, settings.getBlockDelay())).start();
-	}
-
-	public synchronized void unblock(InetAddress ip) {
-		this.blocked.remove(ip);
 	}
 
 	private void prepareSound() {
@@ -178,7 +170,7 @@ public class AwesomeButton {
 		return new File(SOUNDFOLDER+sound.filename);
 	}
 	
-		public void shutdown() {
+	public void shutdown() {
 		running = false;
 		this.socket.close();
 		try {
