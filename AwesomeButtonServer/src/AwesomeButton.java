@@ -1,8 +1,3 @@
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.DatagramPacket;
@@ -28,7 +23,7 @@ public class AwesomeButton {
 	private boolean running = true;
 
 	private Set<InetAddress> blocked;
-	private int currentlyPlaying = 0;
+	private boolean currentlyPlaying = true;
 	private Object mutex = new Object();
 
 	public Settings settings = Settings.loadSettings();
@@ -150,8 +145,8 @@ public class AwesomeButton {
 
 	private void prepareSound() {
 		synchronized (mutex) {
-			currentlyPlaying++;
-			if (settings.hasSj() && currentlyPlaying == 1) {
+			currentlyPlaying = true;
+			if (settings.hasSj() && currentlyPlaying) {
 				setSjVol(settings.getMinVol());
 			}
 		}
@@ -159,8 +154,8 @@ public class AwesomeButton {
 
 	private void endSound() {
 		synchronized (mutex) {
-			currentlyPlaying--;
-			if (settings.hasSj() && currentlyPlaying == 0) {
+			currentlyPlaying = false;
+			if (settings.hasSj() && !currentlyPlaying) {
 				try {
 					setSjVol(settings.getMaxVol());				
 				} catch (Exception e) {	}
