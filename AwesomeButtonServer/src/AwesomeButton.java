@@ -17,42 +17,28 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.StyledDocument;
-
 
 @SuppressWarnings("serial")
-public class AwesomeButton extends JFrame {
+public class AwesomeButton {
 	public final static String SOUNDFOLDER = "sounds/";
 	public final static String SOUNDFILE = SOUNDFOLDER+"sounds.txt";
 	private final static int PORT = 1990;
 
 	private DatagramSocket socket;
 	private boolean running = true;
-	private StyledDocument doc;
-	private JTextPane textPane;
-	private final JFileChooser fc = new JFileChooser();
 
 	private Set<InetAddress> blocked;
 	private int currentlyPlaying = 0;
 	private Object mutex = new Object();
 
-	private Settings settings = Settings.loadSettings();
-
+	public Settings settings = Settings.loadSettings();
+	private AwesomeButtonGUI GUI;
+	
 	public AwesomeButton() throws Exception {
-		super("AwesomeButton");
-		setupGUI();
+		this.GUI = new AwesomeButtonGUI(this);
 
 		if (!Lib.init(new FileInputStream(new File(SOUNDFILE))))
-			println("Failed to initialize sounds.");
+			GUI.println("Failed to initialize sounds.");
 		this.blocked = Collections.synchronizedSet(new HashSet<InetAddress>());
 
 		(new FileRequestServer()).start();
@@ -61,7 +47,7 @@ public class AwesomeButton extends JFrame {
 
 	private void start() throws Exception {
 		byte[] in = new byte[1024];
-		println("Listening on "+InetAddress.getLocalHost()+":"+PORT);
+		GUI.println("Listening on "+InetAddress.getLocalHost()+":"+PORT);
 
 		DatagramPacket p = new DatagramPacket(in, in.length);
 
@@ -85,7 +71,7 @@ public class AwesomeButton extends JFrame {
 			if (parts.length > 0) {
 				int delay = Integer.parseInt(parts[1]);
 				if (delay >= 0) {
-					println("Set blocking time to "+delay);
+					GUI.println("Set blocking time to "+delay);
 					settings.setBlockDelay(delay);
 				}
 			}
@@ -95,7 +81,7 @@ public class AwesomeButton extends JFrame {
 			if (parts.length > 0) {
 				int minVol = Integer.parseInt(parts[1]);
 				if (minVol >= 0 && minVol <= 255) {
-					println("Set min volume to "+minVol);
+					GUI.println("Set min volume to "+minVol);
 					settings.setMinVol(minVol);
 				}
 			}
@@ -104,7 +90,7 @@ public class AwesomeButton extends JFrame {
 			if (parts.length > 0) {
 				int maxVol = Integer.parseInt(parts[1]);
 				if (maxVol >= 0 && maxVol <= 255) {
-					println("Set max volume to "+maxVol);
+					GUI.println("Set max volume to "+maxVol);
 					settings.setMaxVol(maxVol);
 				}
 			}
@@ -112,7 +98,7 @@ public class AwesomeButton extends JFrame {
 			running = false;
 		} else {
 		
-			println("Received \""+m+"\" from "+p.getAddress().toString());
+			GUI.println("Received \""+m+"\" from "+p.getAddress().toString());
 			if (Lib.SOUNDS.containsKey(m)) { // Play a sound
 				requestSound(p.getAddress(), Lib.SOUNDS.get(m));
 			}
@@ -129,7 +115,7 @@ public class AwesomeButton extends JFrame {
 		// Check if the audio file exists
 		File audioFile = getAudioFile(sound);
 		if (!audioFile.exists()) {
-			println("Sound not found: "+sound.filename);
+			GUI.println("Sound not found: "+sound.filename);
 			return false;
 		}
 
@@ -196,108 +182,23 @@ public class AwesomeButton extends JFrame {
 	private File getAudioFile(Sound sound) {
 		return new File(SOUNDFOLDER+sound.filename);
 	}
-
-
-
-	/**
-	 * GUI setup
-	 * @throws Exception
-	 */
-	private void setupGUI() throws Exception {
-		this.socket = new DatagramSocket(PORT);
-
-		JPanel panel = new JPanel(new BorderLayout());
-		JButton close = new JButton("Close");
-		close.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				running = false;
-				socket.close();
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {	}
-				System.exit(0);
-			}
-		});
-		
-		
-		final JButton removeSjButton = new JButton("Remove SilverJuke");
-		removeSjButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				settings.setSjPath(null);
-				removeSjButton.setEnabled(false);
-			}
-		});
-		if (!settings.hasSj()) removeSjButton.setEnabled(false);
-
-		JButton sjButton = new JButton("Find Silverjuke");
-		sjButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				int res = fc.showOpenDialog(AwesomeButton.this);
-
-				if (res == JFileChooser.APPROVE_OPTION) {
-					String path = fc.getSelectedFile().getAbsolutePath();
-					if (!path.endsWith("Silverjuke.exe")) {
-						JOptionPane.showMessageDialog(AwesomeButton.this, 
-								"Invalid file chosen.\nPlease find 'Silverjuke.exe'.");
-					} else {
-						settings.setSjPath(path);
-						removeSjButton.setEnabled(true);
-						println("Saved the path to SilverJuke!");
-					}
-				}
-			}
-		});
-		
-		JPanel bottom = new JPanel();
-		bottom.setLayout(new GridLayout(2, 1));
-		JPanel silverjuke = new JPanel(new GridLayout(1, 2));
-		silverjuke.add(sjButton);
-		silverjuke.add(removeSjButton);
-		bottom.add(silverjuke);
-		bottom.add(close);
-		
-		this.textPane = new JTextPane();
-		this.doc = textPane.getStyledDocument();
-		JScrollPane scrollPane = new JScrollPane(this.textPane);
-
-		panel.add(scrollPane, BorderLayout.CENTER);
-		panel.add(bottom, BorderLayout.SOUTH);
-		this.setPreferredSize(new Dimension(400,200));
-		this.add(panel);
-		this.setVisible(true);
-		this.pack();
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-		if (settings.hasSj()) {
-			File file = new File(settings.getSjPath());
-			if (file.exists()) {
-				fc.setSelectedFile(file);
-			}
-		}
-		fc.setFileFilter(new FileFilter() {
-			@Override
-			public String getDescription() {
-				return "Silverjuke.exe";
-			}
-
-			@Override
-			public boolean accept(File file) {
-				return file.isDirectory() || file.getName().endsWith("Silverjuke.exe");
-			}
-		});
-	}
-
-
-	private synchronized void println(String message) {
+	
+		public void shutdown() {
+		running = false;
+		this.socket.close();
 		try {
-			doc.insertString(doc.getLength(), message+"\n", null);
-			textPane.setCaretPosition(doc.getLength());
-		} catch (BadLocationException e) {}
+			Thread.sleep(500);
+		} catch (InterruptedException e) {	}
+		System.exit(0);
 	}
-
+	
+	public void removeSj() {
+		settings.setSjPath(null);
+	}
+	
+	public void setSjPath(String path) {
+		settings.setSjPath(path);
+	}
 
 	public static void main(String[] args) throws Exception {
 		new AwesomeButton();
