@@ -3,9 +3,6 @@ import java.io.FileInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -22,7 +19,6 @@ public class AwesomeButton {
 	private DatagramSocket socket;
 	private boolean running = true;
 
-	private Set<InetAddress> blocked;
 	private boolean currentlyPlaying = true;
 	private Object mutex = new Object();
 
@@ -35,7 +31,6 @@ public class AwesomeButton {
 
 		if (!Lib.init(new FileInputStream(new File(SOUNDFILE))))
 			GUI.println("Failed to initialize sounds.");
-		this.blocked = Collections.synchronizedSet(new HashSet<InetAddress>());
 
 		(new FileRequestServer()).start();
 		start();
@@ -93,7 +88,6 @@ public class AwesomeButton {
 		} else if (m.equals("abort")) { // Stop the program
 			running = false;
 		} else {
-		
 			GUI.println("Received \""+m+"\" from "+p.getAddress().toString());
 			requestSound(p.getAddress(), m);
 		}
