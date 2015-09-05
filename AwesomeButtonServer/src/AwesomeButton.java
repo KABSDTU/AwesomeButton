@@ -45,7 +45,7 @@ public class AwesomeButton {
 		while (running && socket != null) {
 			try {
 				socket.receive(p);
-			} catch (Exception e) {	continue; }
+			} catch (Exception e) { continue; }
 
 
 			handleInput(p);
@@ -94,15 +94,21 @@ public class AwesomeButton {
 	}
 
 	private void requestSound(InetAddress ip, String soundString) throws Exception {
-		if (blocker.checkAndBlock(ip) && Lib.SOUNDS.containsKey(soundString)) {
-			playSound(Lib.SOUNDS.get(soundString));
+		if (blocker.checkAndBlock(ip)) {
+			if (!playSound(soundString))
+				GUI.println("Could not play song: " + soundString + ".");
 		} else {
-			GUI.println("Could not play song: " + soundString + ". Maybe IP is blocked?");
+			GUI.println("Could not play song: " + soundString + ". IP is blocked.");
 		}
 	}
 
-	private boolean playSound(Sound sound) throws Exception {
-		// Check if the audio file exists
+	private boolean playSound(String soundString) throws Exception {
+		Sound sound = null;
+		if (Lib.SOUNDS.containsKey(soundString)) {
+			sound = Lib.SOUNDS.get(soundString);
+		} else {
+			return false;
+		}
 		File audioFile = getAudioFile(sound);
 		if (!audioFile.exists()) {
 			GUI.println("Sound not found: "+sound.filename);
