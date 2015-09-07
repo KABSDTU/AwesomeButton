@@ -60,6 +60,14 @@ public class AwesomeButton {
 		String command = msg.split(" ")[0];
 		String params = msg.substring(command.length()).trim();
 		
+		/**
+		  Commands to send to AwesomeButton:
+			- delay <milisec>
+			- abort
+			- play / pause
+			- song <song name>
+		**/
+		
 		switch (command) {
 			case "delay":
 				setDelay( Integer.parseInt(params) );
@@ -70,6 +78,11 @@ public class AwesomeButton {
 				break;
 			
 			case "play":
+			case "pause":
+				startStopSj(command);
+				break;
+			
+			case "song":
 				playSong(p.getAddress(), params);
 				break;
 			
@@ -133,8 +146,8 @@ public class AwesomeButton {
 	private void prepareSound() {
 		synchronized (mutex) {
 			currentlyPlaying = true;
-			if (settings.hasSj() && currentlyPlaying) {
-				setSjVol(settings.getMinVol());
+			if (settings.hasSj()) {
+				startStopSj("pause");
 			}
 		}
 	}
@@ -142,13 +155,24 @@ public class AwesomeButton {
 	private void endSound() {
 		synchronized (mutex) {
 			currentlyPlaying = false;
-			if (settings.hasSj() && !currentlyPlaying) {
+			if ( settings.hasSj() ) {
 				try {
-					setSjVol(settings.getMaxVol());				
+					startStopSj("play");
 				} catch (Exception e) {	}
 			}
 		}
 	}
+	
+	private void startStopSj(String startStop) {
+		String command = String.format("--%s", startStop);
+		String[] args = { settings.getSjPath(), command };
+		try {
+			Runtime.getRuntime().exec(args);
+		} catch (Exception e) {
+			GUI.println("Could not " + startStop + " SilverJuke. Error: " + e.getMessage());
+		}
+	}
+
 	
 	private File getAudioFile(Sound sound) {
 		return new File(SOUNDFOLDER+sound.filename);
