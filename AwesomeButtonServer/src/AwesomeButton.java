@@ -55,41 +55,36 @@ public class AwesomeButton {
 	}
 
 	private void handleInput(DatagramPacket p) throws Exception {
-		String m = new String(p.getData(), 0, p.getLength());
-
-		if (m.startsWith("delay ")) { // Change delay
-			String[] parts = m.split(" ");
-			if (parts.length > 0) {
-				int delay = Integer.parseInt(parts[1]);
-				if (delay >= 0) {
-					GUI.println("Set blocking time to "+delay);
-					settings.setBlockDelay(delay);
-				}
-			}
+		String msg = new String(p.getData(), 0, p.getLength());
 		
-		} else if (m.startsWith("min ")) { // Change delay
-			String[] parts = m.split(" ");
-			if (parts.length > 0) {
-				int minVol = Integer.parseInt(parts[1]);
-				if (minVol >= 0 && minVol <= 255) {
-					GUI.println("Set min volume to "+minVol);
-					settings.setMinVol(minVol);
-				}
-			}
-		} else if (m.startsWith("max ")) { // Change delay
-			String[] parts = m.split(" ");
-			if (parts.length > 0) {
-				int maxVol = Integer.parseInt(parts[1]);
-				if (maxVol >= 0 && maxVol <= 255) {
-					GUI.println("Set max volume to "+maxVol);
-					settings.setMaxVol(maxVol);
-				}
-			}
-		} else if (m.equals("abort")) { // Stop the program
-			running = false;
-		} else {
-			GUI.println("Received \""+m+"\" from "+p.getAddress().toString());
-			requestSound(p.getAddress(), m);
+		String command = msg.split(" ")[0];
+		String params = msg.substring(command.length()).trim();
+		
+		switch (command) {
+			case "delay":
+				setDelay( Integer.parseInt(params) );
+				break;
+			
+			case "abort":
+				this.running = false;
+				break;
+			
+			case "play":
+				playSong(p.getAddress(), params);
+				break;
+			
+			default: // backwards compatibility
+				playSong(p.getAddress(), command);
+				break;
+		}
+	}
+	
+	private void playSong(InetAddress ip, String soundString) {
+		GUI.println("Received \""+soundString+"\" from "+ip.toString());
+		try {
+			requestSound(ip, soundString);
+		} catch (Exception e) {
+			GUI.println("Error while playing song: " + soundString + "\nError: " + e.getMessage());
 		}
 	}
 
@@ -155,17 +150,6 @@ public class AwesomeButton {
 		}
 	}
 	
-	private void setSjVol(int vol) {
-		if (vol < 0 || vol > 255) return;
-		String command = String.format(
-				"--execute=\"player.volume=%d\"", 
-				vol);
-		String[] args = { settings.getSjPath(), command };
-		try {
-			Runtime.getRuntime().exec(args);
-		} catch (Exception e) {	}
-	}
-
 	private File getAudioFile(Sound sound) {
 		return new File(SOUNDFOLDER+sound.filename);
 	}
@@ -177,6 +161,15 @@ public class AwesomeButton {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {	}
 		System.exit(0);
+	}
+	
+	private void setDelay(int delay) {
+		if (delay >= 0) {
+			GUI.println("Set blocking time to " + delay);
+			settings.setBlockDelay(delay);
+		} else {
+			GUI.println("Recieved an illigal delay: " + delay);
+		}
 	}
 	
 	public void removeSj() {
